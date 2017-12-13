@@ -77,7 +77,7 @@ public abstract class Gauge extends View {
     private int heightPa = 0;
 
     /** low speed area */
-    private int lowSpeedPercent = 60;
+    private int lowSpeedPercent = 50;
     /** medium speed area */
     private int mediumSpeedPercent = 87;
 
@@ -183,6 +183,7 @@ public abstract class Gauge extends View {
         this.unit =  (unit != null) ? unit : this.unit;
         trembleDegree = a.getFloat(R.styleable.Gauge_sv_trembleDegree, trembleDegree);
         trembleDuration = a.getInt(R.styleable.Gauge_sv_trembleDuration, trembleDuration);
+        lowSpeedPercent = a.getInt(R.styleable.Gauge_sv_lowSpeedPercent, lowSpeedPercent);
         lowSpeedPercent = a.getInt(R.styleable.Gauge_sv_lowSpeedPercent, lowSpeedPercent);
         mediumSpeedPercent = a.getInt(R.styleable.Gauge_sv_mediumSpeedPercent, mediumSpeedPercent);
         speedometerTextRightToLeft = a.getBoolean(R.styleable.Gauge_sv_textRightToLeft, speedometerTextRightToLeft);
@@ -1137,7 +1138,6 @@ public abstract class Gauge extends View {
     public float getLowSpeedOffset() {
         return lowSpeedPercent *.01f;
     }
-
     /**
      * to change low speed area (low section).
      * @param lowSpeedPercent the long of low speed area as percent,

@@ -65,14 +65,14 @@
         <attr name="sv_indicatorColor" format="color" />
         <attr name="sv_markColor" format="color" />
         <attr name="sv_lowSpeedColor" format="color" />
+        <attr name="sv_passingIndicatorColor" format="color" />
         <attr name="sv_mediumSpeedColor" format="color" />
         <attr name="sv_highSpeedColor" format="color" />
         <attr name="sv_backgroundCircleColor" format="color" />
         <attr name="sv_speedometerWidth" format="dimension" />
-
         <attr name="sv_startDegree" format="integer" />
         <attr name="sv_endDegree" format="integer" />
-
+        <attr name="sv_passingIndicatorValue" format="integer" />
         <attr name="sv_indicatorWidth" format="dimension" />
 
         <attr name="sv_indicator" format="enum" >

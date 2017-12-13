@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import com.github.anastr.speedviewlib.components.Indicators.NormalIndicator;
 
@@ -20,6 +21,7 @@ public class SpeedView extends Speedometer {
     private Path markPath = new Path();
     private Paint circlePaint = new Paint(Paint.ANTI_ALIAS_FLAG),
             speedometerPaint = new Paint(Paint.ANTI_ALIAS_FLAG),
+            textPaint = new Paint(Paint.ANTI_ALIAS_FLAG),
             markPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private RectF speedometerRect = new RectF();
 
@@ -83,7 +85,7 @@ public class SpeedView extends Speedometer {
         drawSpeedUnitText(canvas);
 
         drawIndicator(canvas);
-        canvas.drawCircle(getSize() *.5f, getSize() *.5f, getWidthPa()/12f, circlePaint);
+        canvas.drawCircle(getSize() * .5f, getSize() * .5f, getWidthPa() / 12f, circlePaint);
 
         drawNotes(canvas);
     }
@@ -93,37 +95,59 @@ public class SpeedView extends Speedometer {
         Canvas c = createBackgroundBitmapCanvas();
         initDraw();
 
-        float markH = getViewSizePa()/28f;
+        float markH = getViewSizePa() / 28f;
         markPath.reset();
-        markPath.moveTo(getSize() *.5f, getPadding());
-        markPath.lineTo(getSize() *.5f, markH + getPadding());
-        markPaint.setStrokeWidth(markH/3f);
+        markPath.moveTo(getSize() * .5f, getPadding());
+        markPath.lineTo(getSize() * .5f, markH + getPadding());
+        markPaint.setStrokeWidth(markH / 3f);
 
-        float risk = getSpeedometerWidth() *.5f + getPadding();
-        speedometerRect.set(risk, risk, getSize() -risk, getSize() -risk);
-
+        float risk = getSpeedometerWidth() * .5f + getPadding();
+        speedometerRect.set(risk, risk, getSize() - risk, getSize() - risk);
         speedometerPaint.setColor(getHighSpeedColor());
-        c.drawArc(speedometerRect, getStartDegree(), getEndDegree()- getStartDegree(), false, speedometerPaint);
+        c.drawArc(speedometerRect, getStartDegree(), getEndDegree() - getStartDegree(), false, speedometerPaint);
         speedometerPaint.setColor(getMediumSpeedColor());
         c.drawArc(speedometerRect, getStartDegree()
-                , (getEndDegree()- getStartDegree())*getMediumSpeedOffset(), false, speedometerPaint);
+                , (getEndDegree() - getStartDegree()) * getMediumSpeedOffset(), false, speedometerPaint);
         speedometerPaint.setColor(getLowSpeedColor());
         c.drawArc(speedometerRect, getStartDegree()
-                , (getEndDegree()- getStartDegree())*getLowSpeedOffset(), false, speedometerPaint);
+                , (getEndDegree() - getStartDegree()) * getLowSpeedOffset(), false, speedometerPaint);
 
+/**
+ * Passing indicator
+ */
+        if (getPassingIndicatorValue() > 0) {
+            speedometerPaint.setColor(getPassingIndicatorColor());
+            c.drawArc(speedometerRect, getStartDegree() + ((getEndDegree() - getStartDegree()) * getPassingIndicatorOffset())
+                    , -0.5f, false, speedometerPaint);
+            drawPassingText(c);
+        }
         c.save();
-        c.rotate(90f + getStartDegree(), getSize() *.5f, getSize() *.5f);
+        c.rotate(90f + getStartDegree(), getSize() * .5f, getSize() * .5f);
         float everyDegree = (getEndDegree() - getStartDegree()) * .111f;
-        for (float i = getStartDegree(); i < getEndDegree()-(2f*everyDegree); i+=everyDegree) {
-            c.rotate(everyDegree, getSize() *.5f, getSize() *.5f);
+        for (float i = getStartDegree(); i < getEndDegree() - (2f * everyDegree); i += everyDegree) {
+            c.rotate(everyDegree, getSize() * .5f, getSize() * .5f);
             c.drawPath(markPath, markPaint);
         }
         c.restore();
+
 
         if (getTickNumber() > 0)
             drawTicks(c);
         else
             drawDefMinMaxSpeedPosition(c);
+
+    }
+
+    private void drawPassingText(Canvas c) {
+        textPaint.setColor(getPassingIndicatorColor());
+        textPaint.setTextAlign(Paint.Align.CENTER);
+        textPaint.setTextSize(dpTOpx(12));
+
+        double angle_in_radians = (getStartDegree() + ((getEndDegree() - getStartDegree()) * getPassingIndicatorOffset())) * (Math.PI / 180);
+        double perimiter_X_coord = speedometerRect.centerX() + (speedometerRect.height() / 2 - getSpeedometerWidth()) * Math.cos(angle_in_radians);
+        double perimiter_Y_coord = (speedometerRect.centerY() - (speedometerRect.height() / 2 - getSpeedometerWidth()) * -Math.sin(angle_in_radians));
+        Log.v("SPEEDOMETER HEIGHT", perimiter_Y_coord + " Width: " + speedometerRect.width());
+        c.drawText(String.valueOf(getPassingIndicatorValue()), (int) perimiter_X_coord, (int) perimiter_Y_coord, textPaint);
     }
 
     public int getCenterCircleColor() {
@@ -133,6 +157,7 @@ public class SpeedView extends Speedometer {
     /**
      * change the color of the center circle (if exist),
      * <b>this option is not available for all Speedometers</b>.
+     *
      * @param centerCircleColor new color.
      */
     public void setCenterCircleColor(int centerCircleColor) {
